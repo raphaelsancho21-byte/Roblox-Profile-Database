@@ -44,6 +44,7 @@ def help_screen():
         ("/search NOME", "Consultar outra conta"),
         ("/open", "Abrir a última ficha no navegador"),
         ("/profile", "Abrir perfil original no Roblox"),
+        ("/join", "Tentar entrar no jogo do usuário (quando permitido)"),
         ("/json", "Mostrar caminho do último JSON"),
         ("/history", "Ver pesquisas desta sessão"),
         ("/clear", "Limpar a tela"),
@@ -158,6 +159,13 @@ def run(initial_query=None):
                 webbrowser.open(last_html.resolve().as_uri())
                 console.print("[green]Ficha HTML aberta no navegador.[/green]")
             else: console.print("[yellow]Consulte um perfil primeiro.[/yellow]")
+        elif key == "/join":
+            if last_data:
+                uid = int(last_data["profile"]["id"])
+                console.print("[#9eb4ff]Solicitando entrada via Roblox. A plataforma valida permissões de acesso.[/#9eb4ff]")
+                webbrowser.open("roblox://userId=" + str(uid))
+            else:
+                console.print("[yellow]Consulte um perfil primeiro.[/yellow]")
         elif key == "/profile":
             if last_data:
                 uid = int(last_data["profile"]["id"])
