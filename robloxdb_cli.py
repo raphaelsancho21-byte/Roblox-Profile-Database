@@ -118,6 +118,9 @@ def main():
     parser.add_argument("--terminal", action="store_true", help="Mostrar somente no CMD")
     parser.add_argument("--no-open", action="store_true", help="Gerar HTML sem abrir navegador")
     args = parser.parse_args()
+    if not args.terminal and not args.no_open:
+        from robloxdb_tui import run
+        return run(args.user)
     try:
         query = args.user or input("RobloxDB | Digite o username ou UserId: ")
         user_id = find_user(query)
