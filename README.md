@@ -1,72 +1,53 @@
-# RobloxDB CLI V0.3 — Interface interativa
+# RobloxDB V0.4 — CLI + Profile Explorer
 
-CLI para pesquisar informações **públicas** de perfis Roblox, com uma interface de terminal inspirada em ferramentas como Codex e Claude Code. Nenhuma senha, e-mail, cookie ou sessão é solicitado.
+Pesquise perfis públicos do Roblox no terminal com uma interface inspirada em Codex/Claude Code e abra uma ficha visual no navegador com **avatar, ícones de jogos favoritos/criados e imagens dos itens equipados**.
 
-## Instalar / atualizar (Windows PowerShell ou CMD)
+O projeto usa endpoints públicos do Roblox, sem senha, e-mail, cookies, sessões ou login.
 
-Requer Python 3.10+.
+## Instalar / atualizar no Windows
+
+Requer Python 3.10+ (o Python 3.13 também é compatível).
 
 ```powershell
 py -m pip install --user --upgrade --force-reinstall https://github.com/raphaelsancho21-byte/Roblox-Profile-Database/archive/refs/heads/main.zip
-```
-
-Depois execute:
-
-```powershell
 robloxdb
 ```
 
-Se `robloxdb` não for reconhecido, descubra o executável e rode diretamente pelo PowerShell:
+Se o PowerShell disser que `robloxdb` não existe no PATH:
 
 ```powershell
 $script = py -c "import sysconfig; print(sysconfig.get_path('scripts', 'nt_user'))"
 & "$script\robloxdb.exe"
 ```
 
-Para usar `robloxdb` sem caminho no PowerShell atual:
+## Interface
 
-```powershell
-$env:Path += ";$script"
-robloxdb
-```
+Digite `4lurcx` ou outro username exato, ou o UserId numérico.
 
-## Comandos da interface
-
-- Digite um username (ex.: `4lurcx`) ou UserId (ex.: `1`) para consultar.
-- `/search nome` — outra consulta.
-- `/open` — abrir a ficha HTML da última conta pesquisada.
-- `/profile` — abrir o perfil no site do Roblox.
-- `/json` — exibir caminho para o JSON gerado.
-- `/clear` — limpar terminal.
-- `/help` — ver ajuda.
-- `/exit` — sair.
-
-Também é possível iniciar já com uma pesquisa:
+- `/search NOME` — consultar usuário
+- `/open` — abrir dashboard HTML com imagens
+- `/profile` — abrir perfil no Roblox
+- `/json` — mostrar JSON coletado
+- `/clear`, `/help`, `/exit` — comandos do CLI
 
 ```powershell
 robloxdb 4lurcx
-```
-
-Modo clássico sem interface (exportação direta):
-
-```powershell
 robloxdb --terminal 1
 robloxdb --no-open 1
 ```
 
-## Armazenamento
+A pesquisa por username utiliza o endpoint exato `POST /v1/usernames/users`. Nomes de exibição não são usernames: consulte pelo UserId quando houver ambiguidades.
 
-Dados JSON: `%USERPROFILE%\.robloxdb\profiles\USER_ID.json`  
-Fichas HTML: `%USERPROFILE%\.robloxdb\cards\USER_ID.html`
+## Dados e imagens
 
-## Dados consultados
+A ficha HTML exibe foto do avatar, estatísticas, lista de jogos favoritos/criados com ícones e itens atualmente equipados com miniaturas, se disponíveis. Imagens são resolvidas pelos endpoints públicos de thumbnails Roblox. Itens mostram o ID (nomes de catálogo não são consultados nesta versão).
 
-Nome, DisplayName, UserId, descrição, data de criação, contagem de amigos/seguidores/seguindo, jogos favoritos e criados, IDs de itens equipados, visibilidade do inventário e usernames antigos, apenas quando as APIs públicas permitirem. A coleta de jogos consulta até 50 resultados por categoria; este número **não** representa necessariamente o total. Campos indisponíveis são mostrados como tal.
+O HTML é gerado em `%USERPROFILE%\.robloxdb\cards\USER_ID.html`, e os dados em `%USERPROFILE%\.robloxdb\profiles\USER_ID.json`.
 
-Algumas APIs podem mudar, limitar requisições ou exigir autenticação; nenhum bloqueio de privacidade é contornado. A interface Rich é instalada automaticamente pelo pip.
+Alguns jogos, imagens ou itens podem não aparecer porque o perfil é privado, a API está indisponível ou o Roblox não gerou a miniatura. Não coletamos inventário privado ou catálogo completo.
 
-## Workflow no GitHub
+## GitHub Actions
 
-A aba Actions inclui o workflow **Atualizar perfil Roblox** para consultar um UserId específico e salvar o JSON no repositório.
+O workflow **Atualizar perfil Roblox** recebe um UserId e salva uma captura JSON da consulta pública no repositório.
 
-Este projeto não é afiliado à Roblox Corporation. Use-o de forma responsável, sem criar varreduras massivas ou perfis invasivos. Licença MIT.
+Licença MIT. Não afiliado à Roblox Corporation. Não use para varreduras massivas de contas ou agregação invasiva de dados.
