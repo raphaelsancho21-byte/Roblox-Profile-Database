@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "roblox-profile-database-cli"
+version = "0.2.0"
+description = "Consulta perfis públicos Roblox no CMD e gera fichas HTML locais"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+
+[project.scripts]
+robloxdb = "robloxdb_cli:main"
+
+[tool.setuptools]
+py-modules = ["robloxdb_cli"]
+packages = ["src"]
