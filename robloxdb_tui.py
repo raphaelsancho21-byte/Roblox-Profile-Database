@@ -21,13 +21,18 @@ VERSION = "0.3.0"
 ACCENT = "#7c97ff"
 
 def banner():
-    title = Text()
-    title.append("  ▪ ROBLOX", style="bold bright_white")
-    title.append("DB", style="bold #7c97ff")
-    title.append("   /   PROFILE INTELLIGENCE\n", style="bold #8393af")
-    title.append("  Consultas públicas do Roblox, direto no terminal.", style="#aab5d1")
-    console.print(Panel(title, border_style=ACCENT, box=box.ROUNDED, padding=(1, 1)))
-    console.print("[dim]Digite um username ou UserId. Use [bold]/help[/bold] para ver comandos.[/dim]\n")
+    brand = Text(justify="center")
+    brand.append("◆ ", style="bold #9bb1ff")
+    brand.append("ROBLOX", style="bold white")
+    brand.append("DB", style="bold #8ca3ff")
+    brand.append("  v0.4", style="dim")
+    caption = Text("  PROFILE EXPLORER   •   PUBLIC DATA", style="#9eaaca", justify="center")
+    console.print(Panel(
+        Align.center(Text.assemble(brand, "\n", caption)),
+        border_style="#728aff", box=box.ROUNDED, padding=(1, 2)
+    ))
+    console.print("[dim]  Pesquise por username ou UserId  •  /help para comandos  •  /open para imagens[/dim]\n")
+
 
 def help_screen():
     table = Table(box=box.SIMPLE, show_header=False, pad_edge=False)
@@ -40,6 +45,7 @@ def help_screen():
         ("/open", "Abrir a última ficha no navegador"),
         ("/profile", "Abrir perfil original no Roblox"),
         ("/json", "Mostrar caminho do último JSON"),
+        ("/history", "Ver pesquisas desta sessão"),
         ("/clear", "Limpar a tela"),
         ("/help", "Ajuda"),
         ("/exit", "Sair"),
@@ -99,6 +105,7 @@ def run(initial_query=None):
     last_data = None
     last_json = None
     last_html = None
+    history = []
 
     def search(query):
         nonlocal last_data, last_json, last_html
@@ -107,6 +114,7 @@ def run(initial_query=None):
                 console.print("[yellow]Informe nome ou ID.[/yellow]")
                 return
             last_data, last_json, last_html = lookup(query)
+            history.append((str(last_data["profile"].get("name", "?")), int(last_data["profile"]["id"])))
             console.print("[green]✓ Consulta concluída. Snapshot salvo localmente.[/green]")
             profile_panel(last_data)
         except (ValueError, OSError, KeyError) as exc:
@@ -130,6 +138,16 @@ def run(initial_query=None):
             return 0
         elif key in ("/help", "help", "?"):
             help_screen()
+        elif key == "/history":
+            if history:
+                table = Table(title="Pesquisas desta sessão", box=box.SIMPLE)
+                table.add_column("Username", style="#9eb4ff")
+                table.add_column("UserId", style="white")
+                for name, uid in history[-20:]:
+                    table.add_row("@" + name, str(uid))
+                console.print(table)
+            else:
+                console.print("[dim]Nenhuma pesquisa nesta sessão.[/dim]")
         elif key == "/clear":
             console.clear()
             banner()
