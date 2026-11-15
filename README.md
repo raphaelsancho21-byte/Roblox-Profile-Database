@@ -1,57 +1,72 @@
-# Roblox Profile Database — CLI V0.2
+# RobloxDB CLI V0.3 — Interface interativa
 
-Pesquise informações **públicas** de contas Roblox pelo Windows CMD e abra uma ficha visual no navegador, sem senhas, e-mails, cookies ou login.
+CLI para pesquisar informações **públicas** de perfis Roblox, com uma interface de terminal inspirada em ferramentas como Codex e Claude Code. Nenhuma senha, e-mail, cookie ou sessão é solicitado.
 
-## Instalação no Windows
+## Instalar / atualizar (Windows PowerShell ou CMD)
 
-Requer Python 3.10 ou superior. Verifique no CMD com `py --version`.
+Requer Python 3.10+.
 
-Cole no CMD:
-
-```cmd
-py -m pip install --user https://github.com/raphaelsancho21-byte/Roblox-Profile-Database/archive/refs/heads/main.zip
+```powershell
+py -m pip install --user --upgrade --force-reinstall https://github.com/raphaelsancho21-byte/Roblox-Profile-Database/archive/refs/heads/main.zip
 ```
 
-Feche e reabra o CMD. Pesquise:
+Depois execute:
 
-```cmd
-robloxdb Roblox
-robloxdb 1
+```powershell
 robloxdb
-robloxdb --terminal Roblox
+```
+
+Se `robloxdb` não for reconhecido, descubra o executável e rode diretamente pelo PowerShell:
+
+```powershell
+$script = py -c "import sysconfig; print(sysconfig.get_path('scripts', 'nt_user'))"
+& "$script\robloxdb.exe"
+```
+
+Para usar `robloxdb` sem caminho no PowerShell atual:
+
+```powershell
+$env:Path += ";$script"
+robloxdb
+```
+
+## Comandos da interface
+
+- Digite um username (ex.: `4lurcx`) ou UserId (ex.: `1`) para consultar.
+- `/search nome` — outra consulta.
+- `/open` — abrir a ficha HTML da última conta pesquisada.
+- `/profile` — abrir o perfil no site do Roblox.
+- `/json` — exibir caminho para o JSON gerado.
+- `/clear` — limpar terminal.
+- `/help` — ver ajuda.
+- `/exit` — sair.
+
+Também é possível iniciar já com uma pesquisa:
+
+```powershell
+robloxdb 4lurcx
+```
+
+Modo clássico sem interface (exportação direta):
+
+```powershell
+robloxdb --terminal 1
 robloxdb --no-open 1
 ```
 
-Se o Windows não reconhecer `robloxdb`, execute sem depender do PATH:
+## Armazenamento
 
-```cmd
-py -m pip show roblox-profile-database-cli
-```
+Dados JSON: `%USERPROFILE%\.robloxdb\profiles\USER_ID.json`  
+Fichas HTML: `%USERPROFILE%\.robloxdb\cards\USER_ID.html`
 
-O instalador pode informar a pasta `Scripts` que precisa estar no PATH. Como alternativa, execute o arquivo `robloxdb_cli.py` diretamente a partir de uma cópia do repositório: `py robloxdb_cli.py 1`.
+## Dados consultados
 
-## Onde ficam os dados?
+Nome, DisplayName, UserId, descrição, data de criação, contagem de amigos/seguidores/seguindo, jogos favoritos e criados, IDs de itens equipados, visibilidade do inventário e usernames antigos, apenas quando as APIs públicas permitirem. A coleta de jogos consulta até 50 resultados por categoria; este número **não** representa necessariamente o total. Campos indisponíveis são mostrados como tal.
 
-- JSON: `%USERPROFILE%\.robloxdb\profiles\USER_ID.json`
-- Ficha HTML: `%USERPROFILE%\.robloxdb\cards\USER_ID.html`
+Algumas APIs podem mudar, limitar requisições ou exigir autenticação; nenhum bloqueio de privacidade é contornado. A interface Rich é instalada automaticamente pelo pip.
 
-As fichas HTML são locais; imagens de avatar exigem internet.
+## Workflow no GitHub
 
-## Dados
+A aba Actions inclui o workflow **Atualizar perfil Roblox** para consultar um UserId específico e salvar o JSON no repositório.
 
-Nome, DisplayName, UserId, descrição, data de criação, contagens de amigos/seguidores/seguindo, jogos favoritos e criados públicos, IDs de itens equipados, visibilidade do inventário, nomes anteriores públicos quando disponíveis e data de consulta. Listas de jogos são limitadas a 50 itens na versão inicial; contagens e dados podem vir indisponíveis em função de alterações nas APIs ou privacidade.
-
-## Coletor standalone
-
-```cmd
-py src/main.py --username Roblox
-py src/main.py --id 1
-```
-
-## GitHub Actions
-
-Na aba Actions, execute **Atualizar perfil Roblox**, com um UserId. A automação gera JSON público na pasta `data/profiles`.
-
-**Privacidade:** nunca contornar bloqueios de API, não coletar dados privados nem criar bancos massivos de usuários. Não afiliado à Roblox Corporation.
-
-Licença: MIT. Sem dependências Python em tempo de execução.
+Este projeto não é afiliado à Roblox Corporation. Use-o de forma responsável, sem criar varreduras massivas ou perfis invasivos. Licença MIT.
