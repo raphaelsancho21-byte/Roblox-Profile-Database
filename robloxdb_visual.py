@@ -106,7 +106,7 @@ header{position:sticky;top:0;z-index:5;background:#0b101bdc;backdrop-filter:blur
 .logo{font-weight:850;font-size:17px;letter-spacing:.5px}.logo b{color:var(--accent)}.tag{color:var(--muted);font-size:12px}
 main{max-width:1150px;margin:36px auto 70px;padding:0 22px}.panel{border:1px solid var(--line);background:linear-gradient(135deg,#151c2b,#111622);border-radius:20px;padding:25px;margin-bottom:23px;box-shadow:0 15px 35px #0002}
 .hero{display:flex;align-items:center;gap:23px;flex-wrap:wrap}.avatar{width:122px;height:122px;object-fit:cover;border-radius:24px;background:#25304c;flex:none}.hero h1{font-size:clamp(26px,4vw,42px);margin:0;line-height:1.2;overflow-wrap:anywhere}.handle{color:var(--muted);margin:7px 0 17px}
-.btn{display:inline-flex;align-items:center;background:#7790ff;border:1px solid #9bafff;color:#081020;text-decoration:none;font-weight:800;border-radius:10px;padding:9px 15px}.btn:hover{background:#9cb0ff}
+.btn{display:inline-flex;align-items:center;background:#7790ff;border:1px solid #9bafff;color:#081020;text-decoration:none;font-weight:800;border-radius:10px;padding:9px 15px}.btn:hover{background:#9cb0ff}.btn.join{background:#263350;border-color:#495e96;color:#c9d7ff;margin-left:6px}.btn.join:hover{background:#33466d}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}.stat{border:1px solid #303a51;border-radius:14px;padding:15px;background:#1a2232;display:flex;flex-direction:column;align-items:center}.stat strong{font-size:26px}.stat span{font-size:12px;color:var(--muted)}
 .descr{color:#c2cce1;white-space:pre-wrap;overflow-wrap:anywhere;margin:22px 0 0}
 h2{font-size:19px;margin:0 0 16px}.sub{color:var(--muted);font-size:12px;font-weight:400;margin-left:8px}.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
@@ -119,7 +119,7 @@ footer{color:var(--muted);font-size:12px;margin-top:26px}a{outline-offset:4px}
 </style></head><body>
 <header><div class="bar"><div class="logo">ROBLOX<b>DB</b> <span class="tag">/ PROFILE EXPLORER</span></div><div class="tag">PUBLIC DATA · V0.4</div></div></header>
 <main><section class="panel"><div class="hero">__AVATAR__<div><h1>__DISPLAY__</h1><div class="handle">@__NAME__ · ID __ID__</div>
-<a class="btn" href="__PROFILE_URL__" target="_blank" rel="noopener noreferrer">Ver perfil Roblox ↗</a></div></div>
+<a class="btn" href="__PROFILE_URL__" target="_blank" rel="noopener noreferrer">Ver perfil Roblox ↗</a> <a class="btn join" href="__JOIN_URL__">▶ Entrar na partida</a></div></div>
 <div class="stats">__STATS__</div><p class="descr">__DESCRIPTION__</p></section>
 <section class="panel"><h2>★ Jogos favoritos <span class="sub">até 40 registros públicos</span></h2>__FAVORITES__</section>
 <section class="panel"><h2>▣ Jogos criados <span class="sub">até 40 registros públicos</span></h2>__CREATIONS__</section>
@@ -127,7 +127,7 @@ footer{color:var(--muted);font-size:12px;margin-top:26px}a{outline-offset:4px}
 <section class="panel"><h2>Informações da conta</h2><dl class="info">
 <div><dt>Criação</dt><dd>__CREATED__</dd></div><div><dt>Histórico de usernames</dt><dd>__HISTORY__</dd></div>
 <div><dt>Visibilidade do inventário</dt><dd>__INVENTORY__</dd></div><div><dt>UserId</dt><dd>__ID__</dd></div></dl></section>
-<footer>Consulta UTC: __TIMESTAMP__. Informações e imagens dependem dos endpoints públicos do Roblox. O inventário completo não é coletado. RobloxDB não é afiliado ao Roblox.</footer></main></body></html>"""
+<footer>Consulta UTC: __TIMESTAMP__. Informações e imagens dependem dos endpoints públicos do Roblox. O inventário completo não é coletado. O botão de entrada só funciona se o Roblox permitir que você participe. RobloxDB não é afiliado ao Roblox.</footer></main></body></html>"""
     replacement = {
         "__TITLE__": esc(p.get("displayName") or p.get("name")),
         "__AVATAR__": avatar_html,
@@ -135,6 +135,7 @@ footer{color:var(--muted);font-size:12px;margin-top:26px}a{outline-offset:4px}
         "__NAME__": esc(p.get("name")),
         "__ID__": str(user_id),
         "__PROFILE_URL__": esc(profile_url),
+        "__JOIN_URL__": esc("roblox://userId=" + str(user_id)),
         "__STATS__": stats,
         "__DESCRIPTION__": esc(p.get("description") or "Sem descrição pública."),
         "__FAVORITES__": game_cards(favorites, gameimages),
