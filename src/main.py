@@ -45,13 +45,51 @@ def get(base, path, params=None):
     return {'_unavailable': 'Unknown error'}
 
 def resolve(name):
-    # Public username search; exact case-insensitive match only.
-    data = get('users', '/v1/users/search', {'keyword': name, 'limit': 50})
-    matches = data.get('data', []) if isinstance(data, dict) else []
-    for item in matches:
-        if item.get('name', '').casefold() == name.casefold():
-            return item['id']
-    raise ValueError('Username exato não encontrado; use --id para maior precisão.')
+    """Resolve the exact Roblox username using the official bulk lookup."""
+    name = name.strip().lstrip("@")
+    if not name:
+        raise ValueError("Informe o username da conta (não o DisplayName).")
+    url = BASE["users"] + "/v1/usernames/users"
+    payload = json.dumps({
+        "usernames": [name],
+        "excludeBannedUsers": False,
+    }).encode("utf-8")
+    req = urllib.request.Request(url, data=payload, headers={
+        "User-Agent": "RobloxProfileDatabase/0.3 (public lookup)",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+    }, method="POST")
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(req, timeout=15) as response:
+                result = json.load(response)
+            for item in result.get("data", []):
+                requested = item.get("requestedUsername", "")
+                actual = item.get("name", "")
+                if (requested.casefold() == name.casefold()
+                        or actual.casefold() == name.casefold()):
+                    return int(item["id"])
+            raise ValueError(
+                f"Username @{name} não encontrado. Confira o nome de usuário, "
+                "não o nome de exibição."
+            )
+        except urllib.error.HTTPError as ex:
+            if ex.code in (429, 500, 502, 503, 504) and attempt < 2:
+                time.sleep(2 ** attempt + 1)
+                continue
+            raise ValueError(
+                f"API Roblox indisponível (HTTP {ex.code}). "
+                "Tente novamente ou use o UserId."
+            ) from ex
+        except (urllib.error.URLError, TimeoutError) as ex:
+            if attempt < 2:
+                time.sleep(2 ** attempt + 1)
+                continue
+            raise ValueError(
+                "Falha de conexão com Roblox. Verifique sua internet."
+            ) from ex
+    raise ValueError("Falha na consulta ao Roblox.")
+
 
 def snapshot(user_id):
     p = f'/v1/users/{user_id}'
