@@ -88,7 +88,7 @@ a{color:#9fb4ff}.button{display:inline-block;padding:10px 16px;border-radius:9px
 .game:hover{background:#293757}.meta{overflow-wrap:anywhere;line-height:1.7}footer{margin:25px 0 40px;color:#8390aa;font-size:12px}
 @media(max-width:650px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,1fr)}.panel{padding:20px}.stat{padding:10px}.stat b{font-size:18px}h1{font-size:26px}}
 </style></head><body><main class="wrap"><div class="brand">ROBLOXDB / PUBLIC PROFILE</div>
-<section class="panel"><div class="hero">""" + image + """<div><h1>""" + safe(p.get("displayName")) + """</h1><div class="handle">@""" + safe(p.get("name")) + """ · ID """ + safe(user_id) + """</div><a class="button" target="_blank" rel="noopener noreferrer" href="""" + profile_url + """">Abrir no Roblox</a></div></div>
+<section class="panel"><div class="hero">""" + image + """<div><h1>""" + safe(p.get("displayName")) + """</h1><div class="handle">@""" + safe(p.get("name")) + """ · ID """ + safe(user_id) + """</div><a class="button" target="_blank" rel="noopener noreferrer" href=\'""" + profile_url + """\'>Abrir no Roblox</a></div></div>
 <div class="stats">""" + stats + """</div><p class="meta">""" + safe(p.get("description") or "Sem descrição pública.") + """</p></section>
 <div class="grid"><section class="panel"><h2>Jogos favoritos</h2>""" + game_list(data.get("favorite_games")) + """</section>
 <section class="panel"><h2>Jogos criados</h2>""" + game_list(data.get("created_games")) + """</section>
