@@ -4,15 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "roblox-profile-database-cli"
-version = "0.2.0"
-description = "Consulta perfis públicos Roblox no CMD e gera fichas HTML locais"
+version = "0.3.0"
+description = "Interface interativa no terminal para consulta de perfis públicos Roblox"
 readme = "README.md"
 requires-python = ">=3.10"
+dependencies = ["rich>=13.7,<15"] 
 license = {text = "MIT"}
 
 [project.scripts]
 robloxdb = "robloxdb_cli:main"
 
 [tool.setuptools]
-py-modules = ["robloxdb_cli"]
+py-modules = ["robloxdb_cli", "robloxdb_tui"]
 packages = ["src"]
