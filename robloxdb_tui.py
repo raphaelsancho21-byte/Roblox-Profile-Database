@@ -12,7 +12,8 @@ from rich.table import Table
 from rich.text import Text
 from rich.prompt import Prompt
 
-from robloxdb_cli import find_user, snapshot, PROFILE_DIR, CARD_DIR, card
+from robloxdb_cli import find_user, snapshot, PROFILE_DIR, CARD_DIR
+from robloxdb_visual import render as visual_card
 import json
 
 console = Console()
@@ -78,7 +79,7 @@ def profile_panel(data):
         if isinstance(values, list) and values:
             names = [str(x.get("name") or "Jogo") for x in values[:6]]
             console.print("[bold #9eb4ff]" + label + ":[/bold #9eb4ff] " + "  ·  ".join(names))
-    console.print("[dim]Use /open para a ficha HTML ou /profile para o perfil Roblox.[/dim]\n")
+    console.print("[dim]Use /open para a ficha HTML com imagens ou /profile para o Roblox.[/dim]\n")
 
 def lookup(query):
     with console.status("[#9eb4ff]Consultando informações públicas...", spinner="dots"):
@@ -89,7 +90,7 @@ def lookup(query):
         json_path = PROFILE_DIR / f"{user_id}.json"
         html_path = CARD_DIR / f"{user_id}.html"
         json_path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        html_path.write_text(card(data), encoding="utf-8")
+        html_path.write_text(visual_card(data), encoding="utf-8")
     return data, json_path, html_path
 
 def run(initial_query=None):
