@@ -8,6 +8,7 @@ import webbrowser
 from urllib.parse import quote
 
 from src.main import snapshot, resolve
+from robloxdb_visual import render as visual_card
 
 APP_DIR = Path.home() / ".robloxdb"
 PROFILE_DIR = APP_DIR / "profiles"
@@ -134,7 +135,7 @@ def main():
         if args.terminal:
             display_terminal(data)
         else:
-            html_path.write_text(card(data), encoding="utf-8")
+            html_path.write_text(visual_card(data), encoding="utf-8")
             display_terminal(data)
             if not args.no_open:
                 webbrowser.open(html_path.resolve().as_uri())
