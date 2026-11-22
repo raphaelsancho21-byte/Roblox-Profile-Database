@@ -93,8 +93,10 @@ def render(data):
     presence = data.get("presence") or {}
     presence_label = presence.get("status", "Não verificado")
     presence_style = {"Online":"online","Jogando":"playing","No Studio":"studio",
-                      "Offline":"offline"}.get(presence_label,"unknown")
+                      "Offline":"offline", "Offline segundo API":"unknown"}.get(presence_label,"unknown")
     presence_html = '<span class="presence ' + presence_style + '">● ' + esc(presence_label) + '</span>'
+    if presence.get("reason"):
+        presence_html += '<div class="presence-note">' + esc(presence["reason"]) + '</div>'
     stats = "".join('<div class="stat"><strong>' + esc(counts.get(key)) + '</strong><span>' + label + '</span></div>' for key,label in (
         ("friends","Amigos"), ("followers","Seguidores"), ("following","Seguindo")))
     history = data.get("username_history")
@@ -111,7 +113,7 @@ header{position:sticky;top:0;z-index:5;background:#0b101bdc;backdrop-filter:blur
 .logo{font-weight:850;font-size:17px;letter-spacing:.5px}.logo b{color:var(--accent)}.tag{color:var(--muted);font-size:12px}
 main{max-width:1150px;margin:36px auto 70px;padding:0 22px}.panel{border:1px solid var(--line);background:linear-gradient(135deg,#151c2b,#111622);border-radius:20px;padding:25px;margin-bottom:23px;box-shadow:0 15px 35px #0002}
 .hero{display:flex;align-items:center;gap:23px;flex-wrap:wrap}.avatar{width:122px;height:122px;object-fit:cover;border-radius:24px;background:#25304c;flex:none}.presence{display:inline-block;margin:0 0 10px;padding:6px 12px;border-radius:20px;background:#283247;color:#adb9d0;font-weight:750;font-size:13px}
-.presence.online,.presence.playing{background:#123f32;color:#7ce3aa}.presence.studio{background:#163a4c;color:#8dd8ef}.presence.offline{background:#303540;color:#a6acb8}.presence.unknown{background:#4a3822;color:#f5c67e}
+.presence-note{font-size:12px;color:#adbad1;margin:0 0 12px;max-width:460px}.presence.online,.presence.playing{background:#123f32;color:#7ce3aa}.presence.studio{background:#163a4c;color:#8dd8ef}.presence.offline{background:#303540;color:#a6acb8}.presence.unknown{background:#4a3822;color:#f5c67e}
 .hero h1{font-size:clamp(26px,4vw,42px);margin:0;line-height:1.2;overflow-wrap:anywhere}.handle{color:var(--muted);margin:7px 0 17px}
 .btn{display:inline-flex;align-items:center;background:#7790ff;border:1px solid #9bafff;color:#081020;text-decoration:none;font-weight:800;border-radius:10px;padding:9px 15px}.btn:hover{background:#9cb0ff}.btn.join{background:#263350;border-color:#495e96;color:#c9d7ff;margin-left:6px}.btn.join:hover{background:#33466d}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}.stat{border:1px solid #303a51;border-radius:14px;padding:15px;background:#1a2232;display:flex;flex-direction:column;align-items:center}.stat strong{font-size:26px}.stat span{font-size:12px;color:var(--muted)}
