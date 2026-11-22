@@ -6,6 +6,7 @@ from unittest.mock import patch
 import robloxdb_v2 as db
 import robloxdb_v2_tui
 from robloxdb_visual import render
+from robloxdb_presence import check_presence
 
 PROFILE = {
     "profile": {"id": 1234, "name": "SamplePlayer", "displayName": "Sample",
@@ -40,6 +41,21 @@ class CoreTests(unittest.TestCase):
             doc=render(PROFILE)
             self.assertIn("SamplePlayer",doc)
             self.assertIn("PROFILE EXPLORER",doc)
+    def test_presence_online(self):
+        from unittest.mock import MagicMock
+        response = MagicMock()
+        response.__enter__.return_value = response
+        response.read.return_value = b'{"userPresences":[{"userId":1234,"userPresenceType":2}]}'
+        with patch("robloxdb_presence.urllib.request.urlopen", return_value=response):
+            value = check_presence(1234)
+            self.assertEqual(value["status"], "Jogando")
+
+    def test_presence_unavailable_not_offline(self):
+        from urllib.error import HTTPError
+        with patch("robloxdb_presence.urllib.request.urlopen", side_effect=HTTPError("url",403,"Forbidden",{},None)):
+            value = check_presence(1234)
+            self.assertEqual(value["status"], "Indisponível")
+
     def test_tui_is_importable(self):
         self.assertTrue(callable(robloxdb_v2_tui.run))
 
