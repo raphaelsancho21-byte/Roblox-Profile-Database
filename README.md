@@ -91,3 +91,8 @@ Licença MIT. Projeto independente e não afiliado à Roblox Corporation. Use de
 ## Presence — status público
 
 RobloxDB consulta `POST https://presence.roblox.com/v1/presence/users` para um único usuário pesquisado. Apresenta os estados **Offline (0)**, **Online (1)**, **Jogando (2)**, **No Studio (3)** ou **Indisponível (4, erros e restrições)**. A consulta é pontual, não monitora o usuário continuamente e não tenta identificar o jogo ou servidor quando ocultos. A privacidade pode fazer a API mostrar uma pessoa como offline mesmo que ela esteja ativa. O comando `/presence` permite uma atualização manual. A ficha HTML é regenerada ao usar `/open`.
+
+
+## Account Manager (cadastro manual e recuperação)
+
+Use `/accounts` no CLI. Selecione de 1 a 5 cadastros e escolha usernames aleatórios ou manuais. O programa abre a página oficial do Roblox, gera uma senha local opcional, mostrada uma única vez e nunca armazenada, e aguarda você concluir o cadastro. Caso não consiga abrir o site ou surja uma etapa que exige ação humana, escolha **tentar**, **manual** ou **pular**. Escolha **concluido** apenas quando tiver terminado o cadastro e conseguir entrar; a conclusão é confirmada manualmente e não verificada pelo software. O RobloxDB salva apenas usernames e estado local em `~/.robloxdb/account_manager.json`, nunca senhas. Use data de nascimento verdadeira. Não automatiza CAPTCHA, envio de cadastros ou criação em massa e não envia credenciais a webhooks do Discord.
