@@ -41,6 +41,16 @@ class CoreTests(unittest.TestCase):
             doc=render(PROFILE)
             self.assertIn("SamplePlayer",doc)
             self.assertIn("PROFILE EXPLORER",doc)
+    def test_presence_offline_is_qualified(self):
+        from unittest.mock import MagicMock
+        response = MagicMock()
+        response.__enter__.return_value = response
+        response.read.return_value = b'{"userPresences":[{"userId":1234,"userPresenceType":0}]}'
+        with patch("robloxdb_presence.urllib.request.urlopen", return_value=response):
+            value = check_presence(1234)
+            self.assertEqual(value["status"], "Offline segundo API")
+            self.assertIn("privacidade", value["reason"])
+
     def test_presence_online(self):
         from unittest.mock import MagicMock
         response = MagicMock()
