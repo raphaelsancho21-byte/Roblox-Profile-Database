@@ -10,6 +10,7 @@ import string
 import urllib.parse
 import urllib.request
 import json
+import datetime as dt
 import webbrowser
 
 from rich.console import Console
@@ -86,6 +87,15 @@ def manual_account_setup():
     save_json(STATE, {"accounts": [sanitized(a) for a in accounts]})
     for i, account in enumerate(accounts, 1):
         name = account["username"]
+        while True:
+            raw_dob = Prompt.ask(f"Data de nascimento VERDADEIRA para @{name} (DD/MM/AAAA)")
+            try:
+                birth_date = dt.datetime.strptime(raw_dob, "%d/%m/%Y").date()
+                if birth_date > dt.date.today() or birth_date.year < 1900:
+                    raise ValueError("Data fora do intervalo aceito")
+                break
+            except ValueError:
+                console.print("[yellow]Data inválida. Use DD/MM/AAAA, sem inventar a idade.[/yellow]")
         password = new_password()
         console.print(Panel(
             f"[bold]{i}/{count}[/bold]  @{name}\n"
@@ -102,7 +112,7 @@ def manual_account_setup():
                         close_session(session)
                         session = None
                     try:
-                        session = open_autofill(name, password, console)
+                        session = open_autofill(name, password, birth_date, console)
                     except Exception as exc:
                         console.print("[yellow]Preenchimento não disponível: " + type(exc).__name__ +
                                       ". Use 'manual', 'tentar' ou 'pular'.[/yellow]")
