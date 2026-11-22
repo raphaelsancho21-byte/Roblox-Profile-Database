@@ -120,7 +120,7 @@ def main():
     parser.add_argument("--no-open", action="store_true", help="Gerar HTML sem abrir navegador")
     args = parser.parse_args()
     if not args.terminal and not args.no_open:
-        from robloxdb_tui import run
+        from robloxdb_v2_tui import run
         return run(args.user)
     try:
         query = args.user or input("RobloxDB | Digite o username ou UserId: ")
