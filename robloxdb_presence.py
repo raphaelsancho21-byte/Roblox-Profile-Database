@@ -6,7 +6,7 @@ import urllib.error
 import urllib.request
 
 ENDPOINT = "https://presence.roblox.com/v1/presence/users"
-LABELS = {0: "Offline", 1: "Online", 2: "Jogando", 3: "No Studio", 4: "Indisponível"}
+LABELS = {0: "Offline segundo API", 1: "Online", 2: "Jogando", 3: "No Studio", 4: "Indisponível"}
 
 def check_presence(user_id):
     """One-shot public presence query. Never infer offline from an API error."""
@@ -37,7 +37,7 @@ def check_presence(user_id):
             label = LABELS.get(presence_type, "Indisponível")
             # Never store last location, server IDs or private activity metadata.
             return {"status": label, "type": presence_type,
-                    "reason": ("Visibilidade pode ser limitada por privacidade" if presence_type in (0, 4) else None),
+                    "reason": ("O Roblox reportou offline, mas a privacidade ou uma divergência pode ocultar a atividade real" if presence_type == 0 else "Visibilidade pode ser limitada por privacidade" if presence_type == 4 else None),
                     "checked_at_utc": timestamp}
         except urllib.error.HTTPError as exc:
             if exc.code in (429, 500, 502, 503, 504) and attempt < 2:
