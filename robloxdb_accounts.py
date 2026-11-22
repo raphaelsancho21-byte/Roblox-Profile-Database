@@ -1,17 +1,23 @@
-"""Manual Roblox registration assistant. No automated signups or credential collection."""
+"""RobloxDB registration helper: optional autofill and manual verification.
+
+No automated submission. No password export, webhook credentials, or CAPTCHA bypass.
+"""
 from __future__ import annotations
-import json
+import os
 import re
 import secrets
 import string
+import urllib.parse
+import urllib.request
+import json
 import webbrowser
-from pathlib import Path
+
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt, IntPrompt, Confirm
-from rich.progress import Progress, BarColumn, TextColumn
 
-from robloxdb_v2 import HOME, save_json, read_json, stamp
+from robloxdb_v2 import HOME, save_json, stamp
+from robloxdb_autofill import open_autofill, close_session
 
 console = Console()
 STATE = HOME / "account_manager.json"
@@ -32,70 +38,99 @@ def valid_username(name):
 def sanitized(entry):
     return {"username": entry["username"], "status": entry["status"], "updated_at": stamp()}
 
+def notify_discord(username):
+    """Opt-in notice only; intentionally never accepts or transmits passwords."""
+    url = os.getenv("ROBLOXDB_DISCORD_WEBHOOK", "").strip()
+    if not url:
+        return
+    parsed = urllib.parse.urlparse(url)
+    if (parsed.scheme != "https" or parsed.hostname not in ("discord.com", "discordapp.com")
+            or not parsed.path.startswith("/api/webhooks/")):
+        console.print("[yellow]Webhook inválido. Nenhuma notificação enviada.[/yellow]")
+        return
+    payload = {
+        "content": "RobloxDB: cadastro confirmado manualmente. Username: "
+                   + username.replace("@", "") + ". Nenhuma senha foi transmitida.",
+        "allowed_mentions": {"parse": []},
+    }
+    req = urllib.request.Request(url, method="POST",
+                                 data=json.dumps(payload).encode("utf-8"),
+                                 headers={"Content-Type": "application/json",
+                                          "User-Agent": "RobloxDB/2.2"})
+    try:
+        with urllib.request.urlopen(req, timeout=10):
+            pass
+        console.print("[green]Notificação sem credenciais enviada ao Discord.[/green]")
+    except Exception:
+        console.print("[yellow]Não foi possível enviar a notificação ao Discord.[/yellow]")
+
 def manual_account_setup():
-    console.print(Panel("[bold #a0b4ff]ACCOUNT MANAGER[/bold #a0b4ff]\n"
-                        "Assistente de cadastro manual. Nenhuma conta é criada automaticamente.\n"
-                        "[dim]Senhas não são salvas pelo RobloxDB ou enviadas ao Discord.[/dim]",
-                        border_style="#809aff"))
+    console.print(Panel(
+        "[bold #a0b4ff]ACCOUNT MANAGER · ASSISTENTE DE CADASTRO[/bold #a0b4ff]\n"
+        "Preenchimento opcional de username e senha no navegador, quando permitido.\n"
+        "Data de nascimento verdadeira, CAPTCHA e envio final são manuais.\n"
+        "[dim]Nenhuma senha é salva nem enviada ao Discord.[/dim]",
+        border_style="#809aff"))
     count = IntPrompt.ask("Quantas contas?", default=1)
-    if count < 1 or count > 5:
-        console.print("[red]Escolha entre 1 e 5 contas.[/red]")
+    if not 1 <= count <= 5:
+        console.print("[red]Escolha de 1 a 5 contas.[/red]")
         return
     mode = Prompt.ask("Usernames", choices=["aleatorio", "manual"], default="aleatorio")
     accounts = []
-    for index in range(count):
-        if mode == "manual":
-            name = Prompt.ask(f"Username da conta {index+1}").strip()
-            if not valid_username(name):
-                console.print("[yellow]Formato inválido. Use 3–20 letras, números ou underscore; a disponibilidade será validada pelo Roblox.[/yellow]")
-                return
-        else:
-            name = username_suggestion()
+    for i in range(count):
+        name = Prompt.ask(f"Username {i+1}").strip() if mode == "manual" else username_suggestion()
+        if not valid_username(name):
+            console.print("[red]Username inválido; use 3–20 caracteres válidos. O Roblox validará disponibilidade.[/red]")
+            return
         accounts.append({"username": name, "status": "pendente"})
     save_json(STATE, {"accounts": [sanitized(a) for a in accounts]})
-    console.print("[dim]Informe a data de nascimento verdadeira diretamente no cadastro oficial. Não escolha datas aleatórias.[/dim]")
-    for i, account in enumerate(accounts):
-        username = account["username"]
-        console.print(Panel(f"[bold]{i+1}/{count}[/bold]  @{username}\n"
-                            "Abra o cadastro oficial e complete as etapas no navegador.\n"
-                            "Se o Roblox pedir CAPTCHA ou outra verificação, conclua manualmente.",
-                            border_style="#4d5d86"))
+    for i, account in enumerate(accounts, 1):
+        name = account["username"]
         password = new_password()
-        console.print("[yellow]Senha sugerida (exibida uma vez; NÃO salva pelo programa):[/yellow]")
-        console.print(password)
-        console.print("[dim]Copie para seu gerenciador de senhas antes de continuar. Se preferir, use uma senha criada por você.[/dim]")
+        console.print(Panel(
+            f"[bold]{i}/{count}[/bold]  @{name}\n"
+            "Senha sugerida abaixo, exibida apenas uma vez. Guarde-a em um gerenciador de senhas.",
+            border_style="#4d5d86"))
+        console.print("[yellow]Senha:[/yellow] " + password)
+        session = None
         try:
-            webbrowser.open(SIGNUP_URL)
-        except Exception:
-            console.print("[yellow]Não foi possível abrir o navegador.[/yellow]")
-        while True:
-            result = Prompt.ask("Resultado", choices=["concluido", "tentar", "manual", "pular"], default="manual")
-            if result == "tentar":
-                try:
-                    opened = webbrowser.open(SIGNUP_URL)
-                    console.print("[green]Navegador solicitado.[/green]" if opened else
-                                  "[yellow]Não foi possível abrir automaticamente. Entre em https://www.roblox.com/.[/yellow]")
-                except Exception:
-                    console.print("[yellow]Abra https://www.roblox.com/ manualmente.[/yellow]")
-                continue
-            if result == "manual":
-                console.print("[cyan]Finalize o formulário oficial do Roblox no navegador e volte aqui.[/cyan]")
-                console.print("[dim]Você pode escolher 'concluido', 'tentar' ou 'pular' depois.[/dim]")
-                continue
-            if result == "concluido":
-                if not Confirm.ask("Você concluiu o cadastro e consegue entrar nessa conta?", default=False):
+            while True:
+                option = Prompt.ask("Ação", choices=["preencher", "manual", "tentar", "concluido", "pular"],
+                                    default="preencher")
+                if option in ("preencher", "tentar"):
+                    if session:
+                        close_session(session)
+                        session = None
+                    try:
+                        session = open_autofill(name, password, console)
+                    except Exception as exc:
+                        console.print("[yellow]Preenchimento não disponível: " + type(exc).__name__ +
+                                      ". Use 'manual', 'tentar' ou 'pular'.[/yellow]")
                     continue
-                account["status"] = "confirmada pelo usuário"
-            else:
-                account["status"] = "pendente"
-            save_json(STATE, {"accounts": [sanitized(a) for a in accounts]})
-            break
-    confirmed = sum(1 for item in accounts if item["status"] == "confirmada pelo usuário")
-    console.print(Panel(f"[bold #a0b4ff]Resumo[/bold #a0b4ff]\n"
-                        f"{confirmed}/{len(accounts)} cadastros confirmados por você.\n"
-                        f"Registro local sem senhas: {STATE}\n"
-                        "O RobloxDB não pode comprovar sozinho a criação das contas.",
-                        border_style="#809aff"))
+                if option == "manual":
+                    if not session:
+                        webbrowser.open(SIGNUP_URL)
+                    console.print("[cyan]Complete o cadastro no navegador; retorne para confirmar ou pular.[/cyan]")
+                    continue
+                if option == "concluido":
+                    if not Confirm.ask("Você criou a conta e consegue entrar nela?", default=False):
+                        continue
+                    account["status"] = "confirmada pelo usuário"
+                    save_json(STATE, {"accounts": [sanitized(a) for a in accounts]})
+                    notify_discord(name)
+                    break
+                if option == "pular":
+                    account["status"] = "pendente"
+                    save_json(STATE, {"accounts": [sanitized(a) for a in accounts]})
+                    break
+        finally:
+            if session:
+                close_session(session)
+    total = sum(a["status"] == "confirmada pelo usuário" for a in accounts)
+    console.print(Panel(
+        f"[bold #a0b4ff]RESUMO[/bold #a0b4ff]\n{total}/{count} cadastros confirmados por você.\n"
+        f"Registro sem senhas: {STATE}",
+        border_style="#809aff"))
 
 if __name__ == "__main__":
     manual_account_setup()
