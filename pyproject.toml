@@ -15,5 +15,5 @@ license = {text = "MIT"}
 robloxdb = "robloxdb_cli:main"
 
 [tool.setuptools]
-py-modules = ["robloxdb_cli", "robloxdb_tui", "robloxdb_visual", "robloxdb_v2", "robloxdb_v2_tui", "robloxdb_pdf", "robloxdb_presence"]
+py-modules = ["robloxdb_cli", "robloxdb_tui", "robloxdb_visual", "robloxdb_v2", "robloxdb_v2_tui", "robloxdb_pdf", "robloxdb_presence", "robloxdb_accounts"]
 packages = ["src"]
