@@ -68,8 +68,10 @@ def profile(data):
             len(data["created_games"]) if isinstance(data.get("created_games"),list) else None]])
     status = data.get("presence") or {}
     label = status.get("status", "Indisponível")
-    shade = {"Online": "green", "Jogando": "bright_green", "No Studio": "cyan", "Offline": "dim"}.get(label, "yellow")
-    console.print(f"[{shade}]● {label}[/{shade}] [dim](consulta pontual; a privacidade pode limitar o resultado)[/dim]")
+    shade = {"Online": "green", "Jogando": "bright_green", "No Studio": "cyan", "Offline": "dim", "Offline segundo API": "yellow"}.get(label, "yellow")
+    console.print(f"[{shade}]● {label}[/{shade}] [dim](consulta pontual; não garante atividade real)[/dim]")
+    if status.get("reason"):
+        console.print("[dim]  " + str(status["reason"]) + "[/dim]")
     console.print("[dim]/presence atualiza o status · /open abre a ficha · /join solicita entrada autorizada[/dim]")
 
 def help_screen():
