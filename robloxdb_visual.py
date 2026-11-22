@@ -114,17 +114,17 @@ h2{font-size:19px;margin:0 0 16px}.sub{color:var(--muted);font-size:12px;font-we
 .cover{width:100%;aspect-ratio:1/1;background:#222d42}.cover img{width:100%;height:100%;object-fit:cover}.noimage{display:grid;place-items:center;color:#8294ba;font-size:34px;width:100%;height:100%}
 .itemtitle{padding:10px 11px;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .empty{color:var(--muted);margin:0}.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}.info dt{font-size:12px;color:var(--muted)}.info dd{margin:3px 0 0;overflow-wrap:anywhere}
-footer{color:var(--muted);font-size:12px;margin-top:26px}a{outline-offset:4px}
+footer{color:var(--muted);font-size:12px;margin-top:26px}.quicknav{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:22px}.quicknav a{color:#c6d5ff;background:#1a2439;border:1px solid #364563;border-radius:10px;padding:9px 13px;text-decoration:none;font-size:13px;transition:all .2s}.quicknav a:hover{background:#34476d;transform:translateY(-2px)}.panel{animation:rise .45s ease both}@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}a{outline-offset:4px}
 @media(max-width:540px){.panel{padding:17px}.hero{gap:15px}.avatar{width:85px;height:85px}.stats{gap:7px}.stat{padding:11px 4px}.stat strong{font-size:20px}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.tag{display:none}}
 </style></head><body>
-<header><div class="bar"><div class="logo">ROBLOX<b>DB</b> <span class="tag">/ PROFILE EXPLORER</span></div><div class="tag">PUBLIC DATA · V0.4</div></div></header>
-<main><section class="panel"><div class="hero">__AVATAR__<div><h1>__DISPLAY__</h1><div class="handle">@__NAME__ · ID __ID__</div>
+<header><div class="bar"><div class="logo">ROBLOX<b>DB</b> <span class="tag">/ V2 PROFILE EXPLORER</span></div><div class="tag">PUBLIC DATA · V2.0</div></div></header>
+<main><nav class="quicknav"><a href="#favorites">Favoritos</a><a href="#creations">Jogos criados</a><a href="#assets">Equipados</a><a href="#info">Conta</a></nav><section class="panel"><div class="hero">__AVATAR__<div><h1>__DISPLAY__</h1><div class="handle">@__NAME__ · ID __ID__</div>
 <a class="btn" href="__PROFILE_URL__" target="_blank" rel="noopener noreferrer">Ver perfil Roblox ↗</a> <a class="btn join" href="__JOIN_URL__">▶ Entrar na partida</a></div></div>
 <div class="stats">__STATS__</div><p class="descr">__DESCRIPTION__</p></section>
-<section class="panel"><h2>★ Jogos favoritos <span class="sub">até 40 registros públicos</span></h2>__FAVORITES__</section>
-<section class="panel"><h2>▣ Jogos criados <span class="sub">até 40 registros públicos</span></h2>__CREATIONS__</section>
-<section class="panel"><h2>◇ Itens equipados <span class="sub">miniaturas de assets públicos</span></h2>__ASSETS__</section>
-<section class="panel"><h2>Informações da conta</h2><dl class="info">
+<section class="panel" id="favorites"><h2>★ Jogos favoritos <span class="sub">até 40 registros públicos</span></h2>__FAVORITES__</section>
+<section class="panel" id="creations"><h2>▣ Jogos criados <span class="sub">até 40 registros públicos</span></h2>__CREATIONS__</section>
+<section class="panel" id="assets"><h2>◇ Itens equipados <span class="sub">miniaturas de assets públicos</span></h2>__ASSETS__</section>
+<section class="panel" id="info"><h2>Informações da conta</h2><dl class="info">
 <div><dt>Criação</dt><dd>__CREATED__</dd></div><div><dt>Histórico de usernames</dt><dd>__HISTORY__</dd></div>
 <div><dt>Visibilidade do inventário</dt><dd>__INVENTORY__</dd></div><div><dt>UserId</dt><dd>__ID__</dd></div></dl></section>
 <footer>Consulta UTC: __TIMESTAMP__. Informações e imagens dependem dos endpoints públicos do Roblox. O inventário completo não é coletado. O botão de entrada só funciona se o Roblox permitir que você participe. RobloxDB não é afiliado ao Roblox.</footer></main></body></html>"""
