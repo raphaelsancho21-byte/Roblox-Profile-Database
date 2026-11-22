@@ -1,4 +1,4 @@
-# RobloxDB V2.0 — Interactive Profile Workspace
+# RobloxDB V2.1 — Interactive Profile Workspace + Presence
 
 Interface interativa estilo Codex/Claude Code com animação de entrada, pesquisa de perfis Roblox e ficha visual em HTML. Inclui navegação por servidores públicos, favoritos, gerenciador de ocorrências locais, histórico, comparação, exportações e diagnóstico de API.
 
@@ -29,7 +29,7 @@ Para adicionar ao PATH só nesta sessão: `$env:Path += ";$script"`.
 | `/game 4924922222` | Consultar jogo pelo **PlaceId real**, URL ou `u:UniverseId` |
 | `/servers 2` | Mostrar até duas páginas de servidores públicos |
 | `/available` | Mostrar apenas servidores com vaga (da consulta pública) |
-| `/open` | Abrir ficha HTML com avatar, capas de jogos e imagens dos itens equipados |
+| `/open` | Abrir ficha HTML com avatar, capas de jogos, imagens de itens e indicador de presença |\n| `/presence` | Atualizar presença do último usuário consultado |
 | `/join` | Solicitar entrada pelo Roblox, sujeito à privacidade |
 | `/profile` | Abrir página oficial do perfil |
 | `/save user` | Favoritar último usuário |
@@ -86,3 +86,8 @@ py -m compileall -q .
 ```
 
 Licença MIT. Projeto independente e não afiliado à Roblox Corporation. Use de forma legítima, com respeito à privacidade e aos limites de requisições.
+
+
+## Presence — status público
+
+RobloxDB consulta `POST https://presence.roblox.com/v1/presence/users` para um único usuário pesquisado. Apresenta os estados **Offline (0)**, **Online (1)**, **Jogando (2)**, **No Studio (3)** ou **Indisponível (4, erros e restrições)**. A consulta é pontual, não monitora o usuário continuamente e não tenta identificar o jogo ou servidor quando ocultos. A privacidade pode fazer a API mostrar uma pessoa como offline mesmo que ela esteja ativa. O comando `/presence` permite uma atualização manual. A ficha HTML é regenerada ao usar `/open`.
