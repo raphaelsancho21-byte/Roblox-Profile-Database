@@ -1,59 +1,88 @@
-# RobloxDB V0.5 — CLI + Profile Explorer + Join Player
+# RobloxDB V2.0 — Interactive Profile Workspace
 
-Pesquise perfis públicos do Roblox no terminal com uma interface inspirada em Codex/Claude Code e abra uma ficha visual no navegador com **avatar, ícones de jogos favoritos/criados e imagens dos itens equipados**.
+Interface interativa estilo Codex/Claude Code com animação de entrada, pesquisa de perfis Roblox e ficha visual em HTML. Inclui navegação por servidores públicos, favoritos, gerenciador de ocorrências locais, histórico, comparação, exportações e diagnóstico de API.
 
-O projeto usa endpoints públicos do Roblox, sem senha, e-mail, cookies, sessões ou login.
+> O RobloxDB **não rastreia usuários por servidores**, não revela dados privados e não contorna as configurações de privacidade. Listagens de servidores não mostram identidade dos participantes. A entrada em partidas está sujeita às permissões oficiais do Roblox.
 
-## Instalar / atualizar no Windows
-
-Requer Python 3.10+ (o Python 3.13 também é compatível).
+## Instalar no Windows (Python 3.10+)
 
 ```powershell
 py -m pip install --user --upgrade --force-reinstall https://github.com/raphaelsancho21-byte/Roblox-Profile-Database/archive/refs/heads/main.zip
 robloxdb
 ```
 
-Se o PowerShell disser que `robloxdb` não existe no PATH:
+Se `robloxdb` não for reconhecido:
 
 ```powershell
 $script = py -c "import sysconfig; print(sysconfig.get_path('scripts', 'nt_user'))"
 & "$script\robloxdb.exe"
 ```
 
-## Interface
+Para adicionar ao PATH só nesta sessão: `$env:Path += ";$script"`.
 
-Digite `4lurcx` ou outro username exato, ou o UserId numérico.
+## Comandos
 
-- `/search NOME` — consultar usuário
-- `/open` — abrir dashboard HTML com imagens
-- `/profile` — abrir perfil no Roblox
-- `/join` — tentar entrar na partida da última conta consultada (permissão controlada pelo Roblox)
-- `/json` — mostrar JSON coletado
-- `/clear`, `/help`, `/exit` — comandos do CLI
+| Comando | Ação |
+|---|---|
+| `4lurcx` ou `/user 4lurcx` | Consultar usuário pelo username exato (não DisplayName) |
+| `/user 1` | Consultar pelo UserId |
+| `/game 4924922222` | Consultar jogo pelo **PlaceId real**, URL ou `u:UniverseId` |
+| `/servers 2` | Mostrar até duas páginas de servidores públicos |
+| `/available` | Mostrar apenas servidores com vaga (da consulta pública) |
+| `/open` | Abrir ficha HTML com avatar, capas de jogos e imagens dos itens equipados |
+| `/join` | Solicitar entrada pelo Roblox, sujeito à privacidade |
+| `/profile` | Abrir página oficial do perfil |
+| `/save user` | Favoritar último usuário |
+| `/save game` | Favoritar último jogo |
+| `/save server` | Favoritar o primeiro servidor retornado |
+| `/favorites` | Listar favoritos locais |
+| `/unsave user 1` | Remover um favorito |
+| `/case` | Criar ocorrência manual (username, jogo, descrição e evidência) |
+| `/cases` | Listar ocorrências |
+| `/close ID` | Encerrar uma ocorrência |
+| `/history` | Histórico local |
+| `/compare USER1 USER2` | Comparar dois perfis |
+| `/export json` | Exportar JSON do último perfil |
+| `/export csv` | Exportar CSV do último perfil |
+| `/export html` | Abrir ficha HTML animada |
+| `/export pdf` | Gerar relatório PDF |
+| `/diagnose` | Diagnóstico de APIs |
+| `/animations off` | Desligar animação de abertura |
+| `/animations on` | Ligar animação de abertura |
+| `/clear`, `/help`, `/exit` | Navegação |
+
+O menu mostra a listagem completa com `/help`.
+
+## Interface HTML V2
+
+A ficha visual tem tema escuro, animação de aparição, navegação por seções, avatar, estatísticas, miniaturas de jogos favoritos/criados e itens equipados quando públicos. Para usuários sem itens ou jogos públicos, informa indisponibilidade; não inventa dados.
+
+## O que precisa saber
+
+- **Pesquisa de jogos por nome** ainda depende de endpoints de busca que mudam ou exigem autenticação. Atualmente `/game` recebe PlaceId ou URL de jogo.
+- **Server Explorer** lista informações públicas: ocupação, capacidade, ping, FPS e ID de instância (quando oferecido). Não há varredura de jogadores por servidor.
+- **Server favorites** guardam o ID de uma instância pública que pode expirar.
+- **Join player** usa a tentativa de entrada do cliente oficial, nunca promete sucesso ou servidor exato.
+- **Inventário**: miniaturas dos itens equipados; itens não públicos e inventário completo não são acessados.
+- **PDF** usa reportlab, instalado automaticamente, e não depende de Word.
+- **Histórico e ocorrências** ficam armazenados localmente, não sincronizados em servidores externos.
+- A busca exata usa POST usernames/users e pode falhar em bloqueios de rede ou indisponibilidade temporária da API.
+
+## Dados locais
+
+`%USERPROFILE%\.robloxdb\`
+- `profiles\`: capturas JSON
+- `cards\`: fichas HTML
+- `reports\`: relatórios CSV/PDF
+- `cases\`: ocorrências
+- `history.json`: consultas
+- `favorites.json`: favoritos
+- `settings.json`: preferências
+
+## Executar testes locais
 
 ```powershell
-robloxdb 4lurcx
-robloxdb --terminal 1
-robloxdb --no-open 1
+py -m compileall -q .
 ```
 
-A pesquisa por username utiliza o endpoint exato `POST /v1/usernames/users`. Nomes de exibição não são usernames: consulte pelo UserId quando houver ambiguidades.
-
-## Dados e imagens
-
-A ficha HTML exibe foto do avatar, estatísticas, lista de jogos favoritos/criados com ícones e itens atualmente equipados com miniaturas, se disponíveis. Imagens são resolvidas pelos endpoints públicos de thumbnails Roblox. Itens mostram o ID (nomes de catálogo não são consultados nesta versão).
-
-O HTML é gerado em `%USERPROFILE%\.robloxdb\cards\USER_ID.html`, e os dados em `%USERPROFILE%\.robloxdb\profiles\USER_ID.json`.
-
-Alguns jogos, imagens ou itens podem não aparecer porque o perfil é privado, a API está indisponível ou o Roblox não gerou a miniatura. Não coletamos inventário privado ou catálogo completo.
-
-## GitHub Actions
-
-O workflow **Atualizar perfil Roblox** recebe um UserId e salva uma captura JSON da consulta pública no repositório.
-
-Licença MIT. Não afiliado à Roblox Corporation. Não use para varreduras massivas de contas ou agregação invasiva de dados.
-
-
-## Entrar na partida do usuário
-
-Depois de consultar alguém, digite `/join` ou clique no botão **Entrar na partida** da ficha HTML. O sistema abre `roblox://userId=USER_ID` usando o aplicativo oficial. O Roblox decidirá se a entrada está autorizada. **Não há rastreamento de localização, descoberta de servidores ocultos ou contorno de configurações de privacidade.** Se o jogador estiver offline ou impedir entradas, não será possível ingressar. Links profundos legados podem não funcionar em todas as versões do Roblox.
+Licença MIT. Projeto independente e não afiliado à Roblox Corporation. Use de forma legítima, com respeito à privacidade e aos limites de requisições.
