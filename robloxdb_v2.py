@@ -13,6 +13,7 @@ import urllib.error
 import webbrowser
 
 from src.main import resolve, snapshot
+from robloxdb_presence import check_presence
 
 HOME = Path.home() / ".robloxdb"
 PROFILES = HOME / "profiles"
@@ -99,6 +100,7 @@ def lookup_user(query):
     if uid <= 0:
         raise ValueError("UserId inválido")
     data = snapshot(uid)
+    data["presence"] = check_presence(uid)
     save_json(PROFILES / f"{uid}.json", data)
     add_history("profile", str(uid), data["profile"].get("name", str(uid)))
     return data
