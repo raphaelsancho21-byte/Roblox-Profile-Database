@@ -87,6 +87,7 @@ def help_screen():
         ("/favorites", "Ver favoritos locais"),
         ("/unsave TIPO ID", "Remover favorito"),
         ("/case", "Criar ocorrência local (formulário no terminal)"),
+        ("/accounts", "Assistente de cadastro manual de 1 a 5 contas"),
         ("/cases", "Consultar ocorrências"),
         ("/close ID", "Fechar ocorrência"),
         ("/history", "Histórico local de pesquisas"),
@@ -231,6 +232,9 @@ def run(initial_query=None):
                 console.print(f"[green]{db.remove_favorite(kind,ident)} favorito(s) removido(s).[/green]")
             elif key=="/history":table("HISTÓRICO",["Tipo","ID","Nome","Data"],[(x.get("kind"),x.get("id"),x.get("label"),x.get("at")) for x in db.history()])
             elif key=="/case":case_wizard()
+            elif key=="/accounts":
+                from robloxdb_accounts import manual_account_setup
+                manual_account_setup()
             elif key=="/cases":table("OCORRÊNCIAS",["ID","Jogador","Jogo","Estado"],[(x["id"],x["username"],x["game"],x["status"]) for x in db.cases()])
             elif key=="/close":console.print("[green]✓ Ocorrência encerrada:[/green]", db.close_case(arg)["id"])
             elif key=="/compare":
