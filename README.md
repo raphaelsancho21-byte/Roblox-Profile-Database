@@ -96,3 +96,27 @@ RobloxDB consulta `POST https://presence.roblox.com/v1/presence/users` para um �
 ## Account Manager (cadastro manual e recuperação)
 
 Use `/accounts` no CLI. Selecione de 1 a 5 cadastros e escolha usernames aleatórios ou manuais. O programa abre a página oficial do Roblox, gera uma senha local opcional, mostrada uma única vez e nunca armazenada, e aguarda você concluir o cadastro. Caso não consiga abrir o site ou surja uma etapa que exige ação humana, escolha **tentar**, **manual** ou **pular**. Escolha **concluido** apenas quando tiver terminado o cadastro e conseguir entrar; a conclusão é confirmada manualmente e não verificada pelo software. O RobloxDB salva apenas usernames e estado local em `~/.robloxdb/account_manager.json`, nunca senhas. Use data de nascimento verdadeira. Não automatiza CAPTCHA, envio de cadastros ou criação em massa e não envia credenciais a webhooks do Discord.
+
+
+## V2.2 — Preenchimento assistido e notificações seguras
+
+O comando `/accounts` agora oferece as opções `preencher`, `tentar`, `manual`, `concluido` e `pular`.
+
+- `preencher` tenta abrir **Chrome, Edge ou Brave** usando Playwright e completar **somente** username e senha sugeridos. É um preenchimento de melhor esforço: o Roblox pode alterar campos ou bloquear automação; não há garantia de funcionamento.
+- **Data de nascimento verdadeira, CAPTCHA, verificações e envio do formulário continuam manuais**. O aplicativo não cria contas sozinho.
+- `tentar` tenta reabrir o navegador e preencher novamente, `manual` permite completar diretamente na página oficial, `pular` mantém a conta pendente.
+- `concluido` só marca uma conta como confirmada após sua confirmação explícita.
+- O programa **não envia nem armazena senhas**. Guarde-as em um gerenciador de senhas pessoal; elas aparecem uma vez no terminal durante o assistente.
+
+### Notificação opcional do Discord (sem senha)
+
+**Revogue URLs de webhook publicadas em chats ou repositórios** e gere uma nova. No PowerShell atual, configure um webhook novo **sem incluí-lo no código público**:
+
+```powershell
+$env:ROBLOXDB_DISCORD_WEBHOOK = Read-Host "Cole o webhook NOVO do Discord"
+robloxdb
+```
+
+A mensagem enviada só contém o username e a confirmação manual de cadastro. Nenhum token, senha, cookie ou data de nascimento é enviado. O webhook permanece apenas na variável do terminal atual.
+
+Se Playwright não conseguir iniciar o browser, instale ou use Chrome, Edge ou Brave e finalize o cadastro manualmente. Não automatizamos soluções de CAPTCHA nem etapas de segurança.
