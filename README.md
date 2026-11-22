@@ -120,3 +120,8 @@ robloxdb
 A mensagem enviada só contém o username e a confirmação manual de cadastro. Nenhum token, senha, cookie ou data de nascimento é enviado. O webhook permanece apenas na variável do terminal atual.
 
 Se Playwright não conseguir iniciar o browser, instale ou use Chrome, Edge ou Brave e finalize o cadastro manualmente. Não automatizamos soluções de CAPTCHA nem etapas de segurança.
+
+
+### Correção: ordem dos campos no cadastro
+
+O assistente solicita no terminal uma **data de nascimento verdadeira** em `DD/MM/AAAA`, válida, e tenta selecionar **mês, dia e ano primeiro** na página de cadastro do Roblox; somente depois preenche username e senha. A data não é salva no histórico e não é enviada ao webhook. Se os seletores da página mudarem, o aplicativo avisa e permite concluir manualmente. CAPTCHA, verificações e envio final permanecem sob controle do usuário.
