@@ -66,7 +66,11 @@ def profile(data):
           [[c.get("friends"),c.get("followers"),c.get("following"),
             len(data["favorite_games"]) if isinstance(data.get("favorite_games"),list) else None,
             len(data["created_games"]) if isinstance(data.get("created_games"),list) else None]])
-    console.print("[dim]/open abre a ficha com imagens · /save user salva como favorito · /join solicita entrada autorizada[/dim]")
+    status = data.get("presence") or {}
+    label = status.get("status", "Indisponível")
+    shade = {"Online": "green", "Jogando": "bright_green", "No Studio": "cyan", "Offline": "dim"}.get(label, "yellow")
+    console.print(f"[{shade}]● {label}[/{shade}] [dim](consulta pontual; a privacidade pode limitar o resultado)[/dim]")
+    console.print("[dim]/presence atualiza o status · /open abre a ficha · /join solicita entrada autorizada[/dim]")
 
 def help_screen():
     rows = [
@@ -75,6 +79,7 @@ def help_screen():
         ("/servers [PÁGINAS]", "Servidores públicos do último jogo, até 5 páginas"),
         ("/available", "Mostrar servidores com vagas da última consulta"),
         ("/open", "Abrir ficha visual do último perfil no navegador"),
+        ("/presence", "Atualizar status de presença do último usuário"),
         ("/join", "Solicitar entrada no jogo pelo Roblox, se autorizado"),
         ("/save user|game|server", "Favoritar último perfil, jogo ou primeiro servidor"),
         ("/favorites", "Ver favoritos locais"),
@@ -197,6 +202,17 @@ def run(initial_query=None):
             elif key=="/game":get_game(arg)
             elif key=="/servers":get_servers(arg)
             elif key=="/available":get_servers(available=True)
+            elif key=="/presence":
+                if not LAST["user"]:
+                    console.print("[yellow]Consulte um usuário primeiro.[/yellow]")
+                else:
+                    uid = int(LAST["user"]["profile"]["id"])
+                    with console.status("[#8fa5ff]Verificando presença...", spinner="dots"):
+                        LAST["user"]["presence"] = db.check_presence(uid)
+                        db.save_json(db.PROFILES / f"{uid}.json", LAST["user"])
+                    status = LAST["user"]["presence"]
+                    console.print("[bold]Presença:[/bold] " + str(status["status"])
+                                  + " [dim](consulta de " + status["checked_at_utc"] + ")[/dim]")
             elif key=="/open":open_card()
             elif key=="/profile":
                 if LAST["user"]:webbrowser.open("https://www.roblox.com/users/"+str(LAST["user"]["profile"]["id"])+"/profile")
