@@ -84,7 +84,7 @@ def help_screen():
         ("/close ID", "Fechar ocorrência"),
         ("/history", "Histórico local de pesquisas"),
         ("/compare A B", "Comparar dois perfis públicos"),
-        ("/export json|csv|html", "Exportar perfil atual"),
+        ("/export json|csv|html|pdf", "Exportar perfil atual"),
         ("/diagnose", "Diagnosticar APIs Roblox"),
         ("/animations on|off", "Habilitar/desabilitar animações"),
         ("/clear", "Limpar o terminal"),
@@ -169,8 +169,11 @@ def do_export(fmt):
         path=db.export_csv(data)
     elif fmt=="html":
         open_card();return
+    elif fmt=="pdf":
+        from robloxdb_pdf import write_profile_pdf
+        path=write_profile_pdf(data)
     else:
-        console.print("[yellow]Use /export json, csv ou html.[/yellow]");return
+        console.print("[yellow]Use /export json, csv, html ou pdf.[/yellow]");return
     console.print("[green]✓ Arquivo disponível:[/green] "+str(path))
 
 def run(initial_query=None):
