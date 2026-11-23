@@ -18,7 +18,7 @@ from rich.panel import Panel
 from rich.prompt import Prompt, IntPrompt, Confirm
 
 from robloxdb_v2 import HOME, save_json, stamp
-from robloxdb_autofill import open_autofill, close_session
+from robloxdb_batch import BatchBrowser
 
 console = Console()
 STATE = HOME / "account_manager.json"
@@ -67,80 +67,97 @@ def notify_discord(username):
 
 def manual_account_setup():
     console.print(Panel(
-        "[bold #a0b4ff]ACCOUNT MANAGER · ASSISTENTE DE CADASTRO[/bold #a0b4ff]\n"
-        "Preenchimento opcional de username e senha no navegador, quando permitido.\n"
-        "Data de nascimento verdadeira, CAPTCHA e envio final são manuais.\n"
-        "[dim]Nenhuma senha é salva nem enviada ao Discord.[/dim]",
+        "[bold #a0b4ff]ACCOUNT MANAGER · LOTE DE CADASTROS[/bold #a0b4ff]\\n"
+        "Prepara de 1 a 5 contas em janelas com sessões independentes.\\n"
+        "Preenche nascimento, username, senha e tenta clicar Cadastrar.\\n"
+        "CAPTCHA/verificações e confirmação final são sua responsabilidade.\\n"
+        "[dim]As senhas nunca são gravadas ou enviadas ao Discord.[/dim]",
         border_style="#809aff"))
-    count = IntPrompt.ask("Quantas contas?", default=1)
+    count = IntPrompt.ask("Quantas contas (1–5)?", default=1)
     if not 1 <= count <= 5:
         console.print("[red]Escolha de 1 a 5 contas.[/red]")
         return
     mode = Prompt.ask("Usernames", choices=["aleatorio", "manual"], default="aleatorio")
     accounts = []
     for i in range(count):
-        name = Prompt.ask(f"Username {i+1}").strip() if mode == "manual" else username_suggestion()
-        if not valid_username(name):
-            console.print("[red]Username inválido; use 3–20 caracteres válidos. O Roblox validará disponibilidade.[/red]")
+        username = Prompt.ask(f"Username {i+1}").strip() if mode == "manual" else username_suggestion()
+        if not valid_username(username):
+            console.print("[red]Username inválido. O Roblox também verificará disponibilidade.[/red]")
             return
-        accounts.append({"username": name, "status": "pendente"})
-    save_json(STATE, {"accounts": [sanitized(a) for a in accounts]})
-    for i, account in enumerate(accounts, 1):
-        name = account["username"]
         while True:
-            raw_dob = Prompt.ask(f"Data de nascimento VERDADEIRA para @{name} (DD/MM/AAAA)")
+            raw = Prompt.ask(f"Data de nascimento VERDADEIRA de @{username} (DD/MM/AAAA)")
             try:
-                birth_date = dt.datetime.strptime(raw_dob, "%d/%m/%Y").date()
-                if birth_date > dt.date.today() or birth_date.year < 1900:
-                    raise ValueError("Data fora do intervalo aceito")
+                dob = dt.datetime.strptime(raw, "%d/%m/%Y").date()
+                if dob > dt.date.today() or dob.year < 1900:
+                    raise ValueError()
                 break
             except ValueError:
-                console.print("[yellow]Data inválida. Use DD/MM/AAAA, sem inventar a idade.[/yellow]")
-        password = new_password()
+                console.print("[yellow]Data inválida. Use uma data verdadeira em DD/MM/AAAA.[/yellow]")
+        account = {"username": username, "birth_date": dob,
+                   "password": new_password(), "status": "pendente"}
+        accounts.append(account)
+    save_json(STATE, {"accounts": [sanitized(a) for a in accounts]})
+
+    console.print("[bold #a0b4ff]Guarde as senhas antes de prosseguir.[/bold #a0b4ff]")
+    for i, account in enumerate(accounts, 1):
+        console.print(f"[yellow]{i}. @{account['username']}:[/yellow] {account['password']}")
+    if not Confirm.ask("Senhas guardadas em um gerenciador seguro. Abrir as janelas?", default=False):
+        console.print("[dim]Nenhum cadastro iniciado.[/dim]")
+        return
+
+    batch = BatchBrowser()
+    try:
+        batch.start()
+        console.print("[cyan]Abrindo janelas independentes e preenchendo os formulários...[/cyan]")
+        for i, account in enumerate(accounts):
+            console.print(f"[#a0b4ff]{i+1}/{count}[/#a0b4ff] Preparando @{account['username']}...")
+            try:
+                result = batch.prepare(account)
+            except Exception as exc:
+                result = {"status": "manual", "message": "Falha na abertura do formulário: " + type(exc).__name__}
+            account["progress"] = result
+            color = "green" if result["status"] == "submitted" else "yellow"
+            console.print(f"[{color}]{result['message']}[/{color}]")
         console.print(Panel(
-            f"[bold]{i}/{count}[/bold]  @{name}\n"
-            "Senha sugerida abaixo, exibida apenas uma vez. Guarde-a em um gerenciador de senhas.",
-            border_style="#4d5d86"))
-        console.print("[yellow]Senha:[/yellow] " + password)
-        session = None
-        try:
+            "Todos os formulários foram preparados. Se houver CAPTCHA, faça-o em cada janela.\\n"
+            "[dim]Um clique em Cadastrar NÃO confirma a criação. Você deve verificar o resultado.[/dim]",
+            border_style="#809aff"))
+
+        for i, account in enumerate(accounts):
+            username = account["username"]
+            console.print(f"\\n[bold]Resultado da conta {i+1}/{count}: @{username}[/bold]")
             while True:
-                option = Prompt.ask("Ação", choices=["preencher", "manual", "tentar", "concluido", "pular"],
-                                    default="preencher")
-                if option in ("preencher", "tentar"):
-                    if session:
-                        close_session(session)
-                        session = None
+                answer = Prompt.ask("Ação", choices=["concluido","tentar","manual","pular"], default="manual")
+                if answer == "tentar":
                     try:
-                        session = open_autofill(name, password, birth_date, console)
+                        result = batch.retry(i, account)
+                        console.print("[cyan]" + result["message"] + "[/cyan]")
                     except Exception as exc:
-                        console.print("[yellow]Preenchimento não disponível: " + str(exc).replace("[", "(").replace("]", ")") +
-                                      ". Use 'manual', 'tentar' ou 'pular'.[/yellow]")
+                        console.print("[yellow]Falha ao repetir preenchimento: " +
+                                      type(exc).__name__ + "[/yellow]")
                     continue
-                if option == "manual":
-                    if not session:
-                        webbrowser.open(SIGNUP_URL)
-                    console.print("[cyan]Complete o cadastro no navegador; retorne para confirmar ou pular.[/cyan]")
+                if answer == "manual":
+                    console.print("[cyan]Use a janela correspondente e depois retorne para marcar concluído ou pular.[/cyan]")
                     continue
-                if option == "concluido":
-                    if not Confirm.ask("Você criou a conta e consegue entrar nela?", default=False):
+                if answer == "concluido":
+                    if not Confirm.ask("Você conseguiu criar e acessar esta conta?", default=False):
                         continue
                     account["status"] = "confirmada pelo usuário"
-                    save_json(STATE, {"accounts": [sanitized(a) for a in accounts]})
-                    notify_discord(name)
-                    break
-                if option == "pular":
+                    notify_discord(username)
+                else:
                     account["status"] = "pendente"
-                    save_json(STATE, {"accounts": [sanitized(a) for a in accounts]})
-                    break
-        finally:
-            if session:
-                close_session(session)
-    total = sum(a["status"] == "confirmada pelo usuário" for a in accounts)
-    console.print(Panel(
-        f"[bold #a0b4ff]RESUMO[/bold #a0b4ff]\n{total}/{count} cadastros confirmados por você.\n"
-        f"Registro sem senhas: {STATE}",
-        border_style="#809aff"))
+                save_json(STATE, {"accounts": [sanitized(a) for a in accounts]})
+                break
+    except Exception as exc:
+        console.print("[red]Falha no navegador: " + str(exc).replace("[","(").replace("]",")") + "[/red]")
+    finally:
+        batch.close()
+        save_json(STATE, {"accounts": [sanitized(a) for a in accounts]})
+        confirmed = sum(a["status"] == "confirmada pelo usuário" for a in accounts)
+        console.print(Panel(
+            f"[bold]Resumo:[/bold] {confirmed}/{count} contas confirmadas pelo usuário.\\n"
+            f"Dados locais (sem senhas): {STATE}",
+            border_style="#809aff"))
 
 if __name__ == "__main__":
     manual_account_setup()
