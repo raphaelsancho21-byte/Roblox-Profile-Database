@@ -1,4 +1,4 @@
-# RobloxDB V2.4 — Interactive Profile Workspace
+# RobloxDB V2.4.1 — Interactive Profile Workspace
 
 Interface interativa estilo Codex/Claude Code com animação de entrada, pesquisa de perfis Roblox e ficha visual em HTML. Inclui navegação por servidores públicos, favoritos, gerenciador de ocorrências locais, histórico, comparação, exportações e diagnóstico de API.
 
@@ -143,3 +143,8 @@ Cada formulário é aberto e preenchido (data primeiro, username e senha depois)
 As janelas permanecem abertas enquanto você verifica cada cadastro. No terminal, use `concluido` apenas depois de conseguir acessar a conta, `tentar` para preencher/enviar novamente somente quando solicitado por você, `manual` para terminar na janela aberta ou `pular` para deixar pendente.
 
 **Não envia senhas ou datas de nascimento ao Discord.** Notificações opcionais de conclusão manual contêm apenas username. A confirmação do CLI não verifica independentemente a criação da conta.
+
+
+## V2.4.1 — Correção de fluxo de CAPTCHA
+
+O Account Manager não clica mais automaticamente em Cadastrar. Ele prepara o formulário e deixa o usuário enviar e resolver a verificação na página oficial. A opção `tentar` não recarrega automaticamente uma página que poderia conter um CAPTCHA em andamento. Isso evita invalidar acidentalmente a etapa atual, mas **não garante** que o Roblox aceitará o cadastro. Se o próprio site disser "Tente novamente" após completar um CAPTCHA, a validação está sob controle do Roblox; experimente realizar o cadastro manualmente em um navegador normal e consulte o suporte oficial se persistir.
