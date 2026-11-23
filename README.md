@@ -1,4 +1,4 @@
-# RobloxDB V2.3 — Interactive Profile Workspace
+# RobloxDB V2.4 — Interactive Profile Workspace
 
 Interface interativa estilo Codex/Claude Code com animação de entrada, pesquisa de perfis Roblox e ficha visual em HTML. Inclui navegação por servidores públicos, favoritos, gerenciador de ocorrências locais, histórico, comparação, exportações e diagnóstico de API.
 
@@ -132,3 +132,14 @@ O assistente solicita no terminal uma **data de nascimento verdadeira** em `DD/M
 Para atualizar sem colar o comando longo: `robloxdb --update`. O atualizador usa pip e baixa a branch main. Feche outras instâncias do RobloxDB e execute novamente após atualizar.
 
 O assistente `/accounts` agora abre diretamente a página de cadastro `https://www.roblox.com/pt?p=reg`, aguarda o formulário e indica quais campos (mês, dia, ano, username e senha) foram preenchidos. Se o Roblox alterar o layout, bloquear a automação ou pedir login, conclua manualmente. CAPTCHA, verificações e envio final continuam sob controle do usuário. Não envie senhas a webhooks.
+
+
+## V2.4 — Cadastros em janelas independentes
+
+O comando `/accounts` prepara de 1 a 5 inscrições numa única execução. O programa solicita a **data de nascimento verdadeira** de cada conta e gera username e senha. Guarde as senhas antes de confirmar a abertura das janelas. O navegador usa **contextos isolados** para não compartilhar cookies entre contas; a interface pode criar janelas separadas em vez de abas da mesma sessão.
+
+Cada formulário é aberto e preenchido (data primeiro, username e senha depois). Quando todos os cinco campos estão prontos e o botão de cadastro está habilitado, o assistente tenta **clicar uma única vez em Cadastrar**. O clique não garante criação: CAPTCHA, verificação adicional, limitação da plataforma e revisão final dependem do usuário. Nunca tenta forçar botões desabilitados, contornar desafios ou repetir cadastros indefinidamente.
+
+As janelas permanecem abertas enquanto você verifica cada cadastro. No terminal, use `concluido` apenas depois de conseguir acessar a conta, `tentar` para preencher/enviar novamente somente quando solicitado por você, `manual` para terminar na janela aberta ou `pular` para deixar pendente.
+
+**Não envia senhas ou datas de nascimento ao Discord.** Notificações opcionais de conclusão manual contêm apenas username. A confirmação do CLI não verifica independentemente a criação da conta.
