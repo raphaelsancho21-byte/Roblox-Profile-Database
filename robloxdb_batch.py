@@ -1,7 +1,7 @@
 """Browser-assisted batch registration: independent contexts, no CAPTCHA bypass.
 
 All accounts have a user-supplied truthful date of birth. This helper fills
-visible signup controls and clicks the official Register button once if ready.
+visible signup controls and leaves final submission to the user.
 Never treats a click or challenge as proof the account was created.
 """
 from __future__ import annotations
@@ -85,18 +85,11 @@ def prepare_page(page, account):
     if not all(fields.values()):
         missing = ", ".join(label for label, ok in fields.items() if not ok)
         return {"status": "manual", "message": "Campos pendentes: " + missing, "fields": fields}
-    # A change to the official signup form may make the button disabled, or
-    # surface a CAPTCHA / verification. Never force-click a disabled button.
-    try:
-        page.wait_for_timeout(900)
-        for css in SUBMIT_SELECTORS:
-            button = page.locator(css).first
-            if button.count() and button.is_visible() and button.is_enabled():
-                button.click(timeout=6000)
-                return {"status": "submitted", "message": "Clique em Cadastrar efetuado; confira o resultado ou CAPTCHA.", "fields": fields}
-        return {"status": "manual", "message": "Botão Cadastrar ausente/desabilitado. Confira dados e verificações.", "fields": fields}
-    except Exception as exc:
-        return {"status": "manual", "message": "Não consegui clicar no cadastro. Finalize manualmente.", "fields": fields}
+    # Never click signup automatically. Once the site displays a security
+    # challenge, any automated retry/reload can discard its state.
+    return {"status": "ready", "message":
+            "Campos preparados. Clique Cadastrar manualmente e conclua a verificação sem recarregar a página.",
+            "fields": fields}
 
 class BatchBrowser:
     """Keep isolated sessions open while the user finishes verifications."""
@@ -127,7 +120,9 @@ class BatchBrowser:
         return prepare_page(page, account)
 
     def retry(self, index, account):
-        return prepare_page(self.pages[index], account)
+        return {"status": "manual", "message":
+                "Recarregar apagaria a sessão/CAPTCHA. Corrija os campos na janela existente; "
+                "se o Roblox rejeitou a verificação, inicie uma nova tentativa manualmente."}
 
     def close(self):
         if self.browser:
