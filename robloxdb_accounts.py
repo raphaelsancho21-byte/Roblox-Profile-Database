@@ -67,10 +67,10 @@ def notify_discord(username):
 
 def manual_account_setup():
     console.print(Panel(
-        "[bold #a0b4ff]ACCOUNT MANAGER · LOTE DE CADASTROS[/bold #a0b4ff]\\n"
-        "Prepara de 1 a 5 contas em janelas com sessões independentes.\\n"
-        "Preenche nascimento, username, senha e tenta clicar Cadastrar.\\n"
-        "CAPTCHA/verificações e confirmação final são sua responsabilidade.\\n"
+        "[bold #a0b4ff]ACCOUNT MANAGER · LOTE DE CADASTROS[/bold #a0b4ff]\n"
+        "Prepara de 1 a 5 contas em janelas com sessões independentes.\n"
+        "Preenche nascimento, username, senha e tenta clicar Cadastrar.\n"
+        "CAPTCHA/verificações e confirmação final são sua responsabilidade.\n"
         "[dim]As senhas nunca são gravadas ou enviadas ao Discord.[/dim]",
         border_style="#809aff"))
     count = IntPrompt.ask("Quantas contas (1–5)?", default=1)
@@ -119,13 +119,13 @@ def manual_account_setup():
             color = "green" if result["status"] == "submitted" else "yellow"
             console.print(f"[{color}]{result['message']}[/{color}]")
         console.print(Panel(
-            "Todos os formulários foram preparados. Se houver CAPTCHA, faça-o em cada janela.\\n"
+            "Todos os formulários foram preparados. Se houver CAPTCHA, faça-o em cada janela.\n"
             "[dim]Um clique em Cadastrar NÃO confirma a criação. Você deve verificar o resultado.[/dim]",
             border_style="#809aff"))
 
         for i, account in enumerate(accounts):
             username = account["username"]
-            console.print(f"\\n[bold]Resultado da conta {i+1}/{count}: @{username}[/bold]")
+            console.print(f"\n[bold]Resultado da conta {i+1}/{count}: @{username}[/bold]")
             while True:
                 answer = Prompt.ask("Ação", choices=["concluido","tentar","manual","pular"], default="manual")
                 if answer == "tentar":
@@ -155,7 +155,7 @@ def manual_account_setup():
         save_json(STATE, {"accounts": [sanitized(a) for a in accounts]})
         confirmed = sum(a["status"] == "confirmada pelo usuário" for a in accounts)
         console.print(Panel(
-            f"[bold]Resumo:[/bold] {confirmed}/{count} contas confirmadas pelo usuário.\\n"
+            f"[bold]Resumo:[/bold] {confirmed}/{count} contas confirmadas pelo usuário.\n"
             f"Dados locais (sem senhas): {STATE}",
             border_style="#809aff"))
 
