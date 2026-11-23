@@ -4,6 +4,7 @@ import html
 import json
 from pathlib import Path
 import sys
+import subprocess
 import webbrowser
 from urllib.parse import quote
 
@@ -118,7 +119,23 @@ def main():
     parser.add_argument("user", nargs="?", help="Username ou UserId Roblox")
     parser.add_argument("--terminal", action="store_true", help="Mostrar somente no CMD")
     parser.add_argument("--no-open", action="store_true", help="Gerar HTML sem abrir navegador")
+    parser.add_argument("--update", action="store_true", help="Atualizar RobloxDB pelo GitHub")
     args = parser.parse_args()
+    if args.update:
+        source = "https://github.com/raphaelsancho21-byte/Roblox-Profile-Database/archive/refs/heads/main.zip"
+        command = [sys.executable, "-m", "pip", "install", "--user", "--upgrade",
+                   "--force-reinstall", source]
+        print("RobloxDB Updater: instalando a versão mais recente do GitHub...")
+        try:
+            completed = subprocess.run(command, check=False)
+        except OSError as exc:
+            print("Não foi possível iniciar o pip:", exc, file=sys.stderr)
+            return 1
+        if completed.returncode == 0:
+            print("Atualização concluída. Execute robloxdb novamente.")
+        else:
+            print("Falha na atualização (código " + str(completed.returncode) + ").", file=sys.stderr)
+        return completed.returncode
     if not args.terminal and not args.no_open:
         from robloxdb_v2_tui import run
         return run(args.user)
