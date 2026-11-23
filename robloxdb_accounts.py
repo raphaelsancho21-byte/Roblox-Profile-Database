@@ -22,7 +22,7 @@ from robloxdb_autofill import open_autofill, close_session
 
 console = Console()
 STATE = HOME / "account_manager.json"
-SIGNUP_URL = "https://www.roblox.com/"
+SIGNUP_URL = "https://www.roblox.com/pt?p=reg"
 
 def username_suggestion():
     parts = ("Nova", "Pixel", "Cobalt", "Orbit", "Comet", "Vortex", "Lunar", "Nimbus")
@@ -114,7 +114,7 @@ def manual_account_setup():
                     try:
                         session = open_autofill(name, password, birth_date, console)
                     except Exception as exc:
-                        console.print("[yellow]Preenchimento não disponível: " + type(exc).__name__ +
+                        console.print("[yellow]Preenchimento não disponível: " + str(exc).replace("[", "(").replace("]", ")") +
                                       ". Use 'manual', 'tentar' ou 'pular'.[/yellow]")
                     continue
                 if option == "manual":
