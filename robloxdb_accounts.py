@@ -69,7 +69,7 @@ def manual_account_setup():
     console.print(Panel(
         "[bold #a0b4ff]ACCOUNT MANAGER · LOTE DE CADASTROS[/bold #a0b4ff]\n"
         "Prepara de 1 a 5 contas em janelas com sessões independentes.\n"
-        "Preenche nascimento, username, senha e tenta clicar Cadastrar.\n"
+        "Preenche nascimento, username e senha. Você clica Cadastrar.\n"
         "CAPTCHA/verificações e confirmação final são sua responsabilidade.\n"
         "[dim]As senhas nunca são gravadas ou enviadas ao Discord.[/dim]",
         border_style="#809aff"))
@@ -116,11 +116,11 @@ def manual_account_setup():
             except Exception as exc:
                 result = {"status": "manual", "message": "Falha na abertura do formulário: " + type(exc).__name__}
             account["progress"] = result
-            color = "green" if result["status"] == "submitted" else "yellow"
+            color = "green" if result["status"] == "ready" else "yellow"
             console.print(f"[{color}]{result['message']}[/{color}]")
         console.print(Panel(
-            "Todos os formulários foram preparados. Se houver CAPTCHA, faça-o em cada janela.\n"
-            "[dim]Um clique em Cadastrar NÃO confirma a criação. Você deve verificar o resultado.[/dim]",
+            "Formulários preparados. Clique Cadastrar e resolva o CAPTCHA em cada janela.\n"
+            "[dim]Não recarregue a janela durante uma verificação. Só marque concluído após entrar na conta.[/dim]",
             border_style="#809aff"))
 
         for i, account in enumerate(accounts):
