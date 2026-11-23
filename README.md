@@ -1,4 +1,4 @@
-# RobloxDB V2.1 — Interactive Profile Workspace + Presence
+# RobloxDB V2.3 — Interactive Profile Workspace
 
 Interface interativa estilo Codex/Claude Code com animação de entrada, pesquisa de perfis Roblox e ficha visual em HTML. Inclui navegação por servidores públicos, favoritos, gerenciador de ocorrências locais, histórico, comparação, exportações e diagnóstico de API.
 
@@ -125,3 +125,10 @@ Se Playwright não conseguir iniciar o browser, instale ou use Chrome, Edge ou B
 ### Correção: ordem dos campos no cadastro
 
 O assistente solicita no terminal uma **data de nascimento verdadeira** em `DD/MM/AAAA`, válida, e tenta selecionar **mês, dia e ano primeiro** na página de cadastro do Roblox; somente depois preenche username e senha. A data não é salva no histórico e não é enviada ao webhook. Se os seletores da página mudarem, o aplicativo avisa e permite concluir manualmente. CAPTCHA, verificações e envio final permanecem sob controle do usuário.
+
+
+## V2.3 — Atualizador e correção de preenchimento
+
+Para atualizar sem colar o comando longo: `robloxdb --update`. O atualizador usa pip e baixa a branch main. Feche outras instâncias do RobloxDB e execute novamente após atualizar.
+
+O assistente `/accounts` agora abre diretamente a página de cadastro `https://www.roblox.com/pt?p=reg`, aguarda o formulário e indica quais campos (mês, dia, ano, username e senha) foram preenchidos. Se o Roblox alterar o layout, bloquear a automação ou pedir login, conclua manualmente. CAPTCHA, verificações e envio final continuam sob controle do usuário. Não envie senhas a webhooks.
