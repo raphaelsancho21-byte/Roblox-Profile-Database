@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "roblox-profile-database-cli"
-version = "2.4.0"
+version = "2.4.1"
 description = "Interface interativa no terminal para consulta de perfis públicos Roblox"
 readme = "README.md"
 requires-python = ">=3.10"
